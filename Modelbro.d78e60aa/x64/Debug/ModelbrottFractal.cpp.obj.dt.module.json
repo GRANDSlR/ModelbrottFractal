@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "Modelbro.d78e60aa\\x64\\Debug\\ModelbrottFractal.obj",
+            "outputs": [
+                "Modelbro.d78e60aa\\x64\\Debug\\ModelbrottFractal.cpp.obj.dt.module.json",
+                "Modelbro.d78e60aa\\x64\\Debug\\ModelbrottFractal.cpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
