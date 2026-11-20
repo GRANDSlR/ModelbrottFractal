@@ -1,0 +1,6 @@
+﻿  ModelbrottFractal.cpp
+C:\GitReps\ModelbrottFractal\ModelbrottFractal.cpp(206,14): warning C4244: =: преобразование "double" в "unsigned char", возможна потеря данных
+C:\GitReps\ModelbrottFractal\ModelbrottFractal.cpp(207,14): warning C4244: =: преобразование "double" в "unsigned char", возможна потеря данных
+C:\GitReps\ModelbrottFractal\ModelbrottFractal.cpp(208,14): warning C4244: =: преобразование "double" в "unsigned char", возможна потеря данных
+C:\GitReps\ModelbrottFractal\ModelbrottFractal.cpp(513,25): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  ModelbrottFractal.vcxproj -> C:\GitReps\ModelbrottFractal\x64\Debug\ModelbrottFractal.exe

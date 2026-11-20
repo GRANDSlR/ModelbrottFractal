@@ -212,6 +212,54 @@ void palette_violet(double t, unsigned char& r, unsigned char& g, unsigned char&
     b = std::clamp((int)(b * brightness), 0, 255);
 }
 
+
+void palette_white_cyan_blue(double t, unsigned char& r, unsigned char& g, unsigned char& b)
+{
+    t = std::clamp(t, 0.0, 1.0);
+
+    const double W_R = 255, W_G = 255, W_B = 255;   // белый
+    const double C_R = 0, C_G = 255, C_B = 255;   // голубой
+    const double S_R = 0, S_G = 0, S_B = 255;   // синий
+
+    const double mid = 0.7;   // <-- точка голубого (было 0.5)
+    // 0.6 — чуть больше белого, 0.75 — много белого
+
+    double R, G, B;
+    if (t < mid) {
+
+        double k = t / mid;
+        k = std::pow(k, 2.0);
+        R = W_R + (C_R - W_R) * k;
+        G = W_G + (C_G - W_G) * k;
+        B = W_B + (C_B - W_B) * k;
+    }
+    else {
+        double k = (t - mid) / (1.0 - mid);
+        R = C_R + (S_R - C_R) * k;
+        G = C_G + (S_G - C_G) * k;
+        B = C_B + (S_B - C_B) * k;
+    }
+
+    r = (unsigned char)std::clamp(R, 0.0, 255.0);
+    g = (unsigned char)std::clamp(G, 0.0, 255.0);
+    b = (unsigned char)std::clamp(B, 0.0, 255.0);
+}
+
+
+void palette_white_blue(double t, unsigned char& r, unsigned char& g, unsigned char& b)
+{
+    t = std::clamp(t, 0.0, 1.0);
+
+    double R = 255.0 * std::pow(1.0 - t, 3.0);
+    double G = 255.0 * std::pow(1.0 - t, 2.0);
+    double B = 255.0;
+
+    r = (unsigned char)std::clamp(R, 0.0, 255.0);
+    g = (unsigned char)std::clamp(G, 0.0, 255.0);
+    b = (unsigned char)std::clamp(B, 0.0, 255.0);
+}
+
+
 double julia(int px, int py, int width, int height,
     double xmin, double xmax,
     double ymin, double ymax,
@@ -249,30 +297,28 @@ double mandelbrot(int px, int py, int width, int height,
 }
 
 // Универсальная функция генерации фрактала
-void generateFractal(const std::string& filename,
-    int width, int height, int maxIter,
-    double xmin, double xmax,
-    double ymin, double ymax,
-    bool useJulia, std::complex<double> c) {
+void generateFractal(const std::string& filename,int width, int height, int maxIter,double xmin, double xmax,double ymin, double ymax) {
+
     std::ofstream out(filename);
     out << "P3\n" << width << " " << height << "\n255\n";
 
     for (int py = 0; py < height; ++py) {
         for (int px = 0; px < width; ++px) {
-            double t = useJulia
-                ? julia(px, py, width, height, xmin, xmax, ymin, ymax, maxIter, c)
-                : mandelbrot(px, py, width, height, xmin, xmax, ymin, ymax, maxIter);
+
+            double t = mandelbrot(px, py, width, height, xmin, xmax, ymin, ymax, maxIter);
 
             unsigned char r, g, b;
+
             //palette4(t, r, g, b);
-            palette_violet(t, r, g, b);
+            palette_white_blue(t, r, g, b);
+            //palette_violet(t, r, g, b);
             out << (int)r << " " << (int)g << " " << (int)b << " ";
         }
         out << "\n";
     }
 
     out.close();
-    std::cout << "Saved " << filename << "\n";
+    std::cout << "Saved " << filename << std::endl;
 }
 
 
@@ -399,22 +445,10 @@ double centerX = -1.3;
 double centerY = 0.95;
 double scale = 0.5;*/
 
+
+
 void startMadelbrot(int width, int height, int maxIter)
 {
-
-    //const int width = 1200;
-    //const int height = 800;
-    //const int maxIter = 20;
-
-
-    //const int width = 3840;
-    //const int height = 2160;
-
-    //const int width = 1200;
-    //const int height = 800;
-
-    //const int maxIter = 300;
-
     // Область для спирали
     //double centerX = -0.7435;
     //double centerY = 0.1410;
@@ -430,59 +464,57 @@ void startMadelbrot(int width, int height, int maxIter)
     double centerY = -0.95;
     double scale = 0.5;
 
-
     double xmin = centerX - scale, xmax = centerX + scale;
     double ymin = centerY - scale, ymax = centerY + scale;
 
-    // Параметр для Жюлиа
-    std::complex<double> c(-0.8, 0.156);
+
 
     const std::string fileName = "mandelbrot" + std::to_string(rand());
     const std::string outputFilePPM = "Mandelbrott\\" + fileName + ".ppm";
     const std::string outputFilePNG = "Mandelbrott\\" + fileName;
+
     //  Мандельброт
     generateFractal(outputFilePPM, width, height, maxIter,
-        xmin, xmax, ymin, ymax, false, c);
+        xmin, xmax, ymin, ymax);
 
     convertPPMtoPNG(outputFilePPM, outputFilePNG);
     
-    //  Жюлиа
-    //generateFractal("julia" + std::to_string(rand()) + ".ppm", width, height, maxIter,
-    //    xmin, xmax, ymin, ymax, true, c);
-
 }
+
+struct WindowParamsHight {
+
+    int width = 5760;
+    int height = 3600;
+    int maxIter = 20;
+    //int maxIter = 1000;
+
+};
+
+struct WindowParamsLow {
+
+    int width = 960;
+    int height = 600;
+    int maxIter = 20;
+    //int maxIter = 1000;
+
+};
+
+struct WindowParamsGenerate {
+
+    int width = 320; // 320 640
+    int height = 200; // 200 400
+    int maxIter = 20;
+    //int maxIter = 1000;
+
+};
 
 
 int main() {
     std::srand(std::time(nullptr));
 
-    //2.8, 4.0, 0.0, 1.0
-    //rmin, rmax, xmin, xmax
-    //3840,
-    //    2160,
-    //    1000,
-    // 5760 3600  in 3 times more than 1920 1200
+    const WindowParamsHight windowParamsHight;
+    const WindowParamsGenerate windowParamsGenerate;
 
-
-    //const int width = 3840;
-    //const int height = 2400;
-
-    const int width = 5760;
-    const int height = 3600;
-
-    //const int width = 960;
-    //const int height = 600;
-
-    //const int maxIter = 1000;
-
-
-    //const int width = 1200;
-    //const int height = 800;
-
-    const int maxIter = 20;
-
-
-    double rmin = 2.8, rmax = 4.0, xmin = 0.0, xmax = 1.0;
 
 
     time_t now = time(nullptr);
@@ -493,8 +525,11 @@ int main() {
     localtime_s(&local_time, &timeStart);
     std::cout << "Time start: " << std::put_time(&local_time, "%H:%M:%S") << std::endl;
 
+    // генерация
+    //startMadelbrot(windowParamsGenerate.width, windowParamsGenerate.height, windowParamsGenerate.maxIter);
 
-    startMadelbrot(width, height, maxIter);
+    // итоговое фото в высоком разрешении
+    startMadelbrot(windowParamsHight.width, windowParamsHight.height, windowParamsHight.maxIter);
 
     //const std::string fileName = "mandelbrot5874";
     //const std::string outputFilePPM = "Mandelbrott\\" + fileName + ".ppm";
@@ -502,7 +537,12 @@ int main() {
 
     //convertPPMtoPNG(outputFilePPM, outputFilePNG);
 
+
+
     // Продвинутый Фейгенбаум с плотностью
+    // 
+    // double rmin = 2.8, rmax = 4.0, xmin = 0.0, xmax = 1.0;
+    // 
     //feigenbaumFractal("Feigenbaum\\feigenbaum_density" + std::to_string(rand()) + ".ppm",
     //    width,
     //    height,
